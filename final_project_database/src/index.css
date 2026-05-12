@@ -73,6 +73,10 @@ body {
   min-width: 1000px;
 }
 
+.dashboard-table {
+  min-width: 900px;
+}
+
 .finished-workout-table {
   min-width: 1000px;
 }

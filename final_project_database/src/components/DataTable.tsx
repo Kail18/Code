@@ -5,8 +5,8 @@ type DataTableProps = {
 
 export default function DataTable({ columns, rows }: DataTableProps) {
   return (
-    <div className="table-responsive">
-      <table className="table table-hover align-middle">
+    <div className="horizontal-scroll-table">
+      <table className="table table-hover align-middle dashboard-table">
         <thead className="table-light">
           <tr>
             {columns.map((column) => (

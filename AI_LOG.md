@@ -19,6 +19,7 @@ ChatGPT
 -I noticed all the code was in one file for multiple view and components. I prompted for a structured list of folders and files to contain the different components and views.
 -After adding the structure in a series of prompts I had it split the code into different views and then give me an updated APP.tsx file.
 -I noticed that the table in the finished_workout view was not able to handle a change in window size. I asked for a solution gpt gave a poor solution so I instead prompted it to make a horizontal scroll to the table. This one took multiple prompts as I noticed it kept trying to decrease the minimum window size without adding any scrolling functionality.
+-I noticed the dashboard table was correct in a smalled window size. I copied the section of code where the issue was. I then pasted it and told the AI that this needs to be converted to a horizontal scroll similar to finished_workout. This is where I noticed it object oriented the tables for other views just not finished workout.
 
 **Question 3**
 

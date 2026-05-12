@@ -109,10 +109,6 @@ export default function Dashboard({
       <div className="card shadow-sm">
         <div className="card-body">
           <h4 className="fw-bold mb-1">Finished Workout Log</h4>
-          <p className="text-muted small">
-            This table represents records similar to your Workout Exercises
-            table.
-          </p>
 
           <DataTable
             columns={[
