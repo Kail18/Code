@@ -10,6 +10,6 @@
 - Second you need to install typescript
 - Third you need VSCode
 - In VSCode navigate to the terminal till your in the project directory
-- run: npm i (this will install the npm dependencies)
-- next run: npm run dev (this will run the server as a local host)
-- copy and paste the http localhost into your browser to see the react app
+- Run: npm i (this will install the npm dependencies)
+- Next run: npm run dev (this will run the server as a local host)
+- Copy and paste the http localhost into your browser to see the react app
