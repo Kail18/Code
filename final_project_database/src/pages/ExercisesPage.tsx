@@ -47,14 +47,23 @@ export default function ExercisePage({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!form.name.trim() || !form.muscleGroup.trim()) return;
+    if (!form.name.trim() || !form.muscleGroup.trim()) {
+      return;
+    }
 
     if (editingId) {
-      setExercises(
-        exercises.map((exercise) =>
-          exercise.id === editingId ? { ...exercise, ...form } : exercise
-        )
-      );
+      await fetch(`http://localhost:5001/api/exercises/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          muscleGroup: form.muscleGroup,
+          equipment: form.equipment,
+          tracking: form.tracking,
+        }),
+      });
     } else {
       await fetch("http://localhost:5001/api/exercises", {
         method: "POST",
@@ -68,18 +77,20 @@ export default function ExercisePage({
           tracking: form.tracking,
         }),
       });
-
-      const response = await fetch("http://localhost:5001/api/exercises");
-      const data = await response.json();
-
-      setExercises(data);
     }
+
+    const response = await fetch("http://localhost:5001/api/exercises");
+
+    const data = await response.json();
+
+    setExercises(data);
 
     resetForm();
   }
 
   function handleEdit(exercise: Exercise) {
     setEditingId(exercise.id);
+
     setForm({
       name: exercise.name,
       muscleGroup: exercise.muscleGroup,
@@ -88,8 +99,16 @@ export default function ExercisePage({
     });
   }
 
-  function handleDelete(id: Id) {
-    setExercises(exercises.filter((exercise) => exercise.id !== id));
+  async function handleDelete(id: Id) {
+    await fetch(`http://localhost:5001/api/exercises/${id}`, {
+      method: "DELETE",
+    });
+
+    const response = await fetch("http://localhost:5001/api/exercises");
+
+    const data = await response.json();
+
+    setExercises(data);
   }
 
   return (
