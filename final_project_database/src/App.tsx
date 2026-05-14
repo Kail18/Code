@@ -1,18 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
-import {
-  initialExercises,
-  initialFinishedWorkouts,
-  initialPrograms,
-  initialUsers,
-  initialWorkouts,
-} from "./data/initialData";
 import Dashboard from "./pages/Dashboard";
 import ExercisePage from "./pages/ExercisesPage";
 import FinishedWorkoutPage from "./pages/FinishedWorkoutsPage";
 import ProgramsPage from "./pages/ProgramsPage";
 import UsersPage from "./pages/UsersPage";
 import WorkoutsPage from "./pages/WorkoutsPage";
+
 import type {
   Exercise,
   FinishedWorkout,
@@ -25,13 +19,70 @@ import type {
 export default function App() {
   const [activePage, setActivePage] = useState<PageKey>("dashboard");
 
-  const [programs, setPrograms] = useState<Program[]>(initialPrograms);
-  const [workouts, setWorkouts] = useState<Workout[]>(initialWorkouts);
-  const [exercises, setExercises] = useState<Exercise[]>(initialExercises);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [finishedWorkouts, setFinishedWorkouts] = useState<FinishedWorkout[]>(
-    initialFinishedWorkouts
+    []
   );
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
+
+  // =========================
+  // FETCH WORKOUTS
+  // =========================
+  useEffect(() => {
+    fetch("http://localhost:5001/api/workouts")
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedWorkouts = data.map((workout: Workout) => ({
+          ...workout,
+          completed: Boolean(workout.completed),
+        }));
+
+        setWorkouts(formattedWorkouts);
+      })
+      .catch((err) => console.error("Error fetching workouts:", err));
+  }, []);
+
+  // =========================
+  // FETCH PROGRAMS
+  // =========================
+  useEffect(() => {
+    fetch("http://localhost:5001/api/programs")
+      .then((res) => res.json())
+      .then((data) => setPrograms(data))
+      .catch((err) => console.error("Error fetching programs:", err));
+  }, []);
+
+  // =========================
+  // FETCH EXERCISES
+  // =========================
+  useEffect(() => {
+    fetch("http://localhost:5001/api/exercises")
+      .then((res) => res.json())
+      .then((data) => setExercises(data))
+      .catch((err) => console.error("Error fetching exercises:", err));
+  }, []);
+
+  // =========================
+  // FETCH USERS
+  // =========================
+  useEffect(() => {
+    fetch("http://localhost:5001/api/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.error("Error fetching users:", err));
+  }, []);
+
+  // =========================
+  // FETCH FINISHED WORKOUTS
+  // =========================
+  useEffect(() => {
+    fetch("http://localhost:5001/api/finished-workouts")
+      .then((res) => res.json())
+      .then((data) => setFinishedWorkouts(data))
+      .catch((err) => console.error("Error fetching finished workouts:", err));
+  }, []);
 
   const pageTitle: Record<PageKey, string> = {
     dashboard: "Dashboard",
