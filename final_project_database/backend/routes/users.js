@@ -59,4 +59,56 @@ router.post("/", async (req, res) => {
   }
 });
 
+// =========================
+// UPDATE USER
+// =========================
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, email, dateJoined } = req.body;
+
+    await db.query(
+      `
+      UPDATE User
+      SET
+        first_name = ?,
+        last_name = ?,
+        email = ?,
+        date_joined = ?
+      WHERE user_id = ?
+      `,
+      [firstName, lastName, email, dateJoined, id]
+    );
+
+    res.json({ message: "User updated successfully" });
+  } catch (error) {
+    console.error("Error updating user:", error.message);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// =========================
+// DELETE USER
+// =========================
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query(
+      `
+      DELETE FROM User
+      WHERE user_id = ?
+      `,
+      [id]
+    );
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error.message);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
 module.exports = router;

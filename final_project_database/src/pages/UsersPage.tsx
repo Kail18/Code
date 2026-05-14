@@ -49,11 +49,18 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
     }
 
     if (editingId) {
-      setUsers(
-        users.map((user) =>
-          user.id === editingId ? { ...user, ...form } : user
-        )
-      );
+      await fetch(`http://localhost:5001/api/users/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          dateJoined: form.dateJoined,
+        }),
+      });
     } else {
       await fetch("http://localhost:5001/api/users", {
         method: "POST",
@@ -67,14 +74,12 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
           dateJoined: form.dateJoined,
         }),
       });
-
-      const response = await fetch("http://localhost:5001/api/users");
-
-      const data = await response.json();
-
-      setUsers(data);
     }
 
+    const response = await fetch("http://localhost:5001/api/users");
+    const data = await response.json();
+
+    setUsers(data);
     resetForm();
   }
 
@@ -85,12 +90,19 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      dateJoined: user.dateJoined,
+      dateJoined: String(user.dateJoined).slice(0, 10),
     });
   }
 
-  function handleDelete(id: Id) {
-    setUsers(users.filter((user) => user.id !== id));
+  async function handleDelete(id: Id) {
+    await fetch(`http://localhost:5001/api/users/${id}`, {
+      method: "DELETE",
+    });
+
+    const response = await fetch("http://localhost:5001/api/users");
+    const data = await response.json();
+
+    setUsers(data);
   }
 
   return (
