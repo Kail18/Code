@@ -150,6 +150,57 @@ app.get("/api/finished-workouts", async (req, res) => {
   }
 });
 
+app.post("/api/workouts", async (req, res) => {
+  try {
+    const {
+      id,
+      userId,
+      programId,
+      name,
+      date,
+      duration,
+      completed,
+    } = req.body;
+
+    await db.query(
+      `
+      INSERT INTO Workout
+      (
+        workout_id,
+        user_id,
+        program_id,
+        workout_name,
+        workout_date,
+        duration,
+        completed,
+        date_completed
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        id,
+        userId,
+        programId,
+        name,
+        date,
+        duration,
+        completed,
+        completed ? new Date() : null,
+      ]
+    );
+
+    res.status(201).json({
+      message: "Workout created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating workout:", error.message);
+
+    res.status(500).json({
+      error: "Failed to create workout",
+    });
+  }
+});
+
 
 const PORT = process.env.PORT || 5001;
 

@@ -52,25 +52,48 @@ export default function WorkoutsPage({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.name.trim() || !form.program.trim()) return;
 
     if (editingId) {
+      // We will handle database updates later with PUT.
       setWorkouts(
         workouts.map((workout) =>
           workout.id === editingId ? { ...workout, ...form } : workout
         )
       );
     } else {
-      setWorkouts([
-        ...workouts,
-        {
-          id: createId("W", workouts.length),
-          ...form,
+      const selectedProgram = programs.find(
+        (program) => program.name === form.program
+      );
+
+      await fetch("http://localhost:5001/api/workouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify({
+          id: createId("W", workouts.length),
+          userId: "U001",
+          programId: selectedProgram?.id || "P001",
+          name: form.name,
+          date: form.date,
+          duration: form.duration,
+          completed: form.completed,
+        }),
+      });
+
+      const response = await fetch("http://localhost:5001/api/workouts");
+      const data = await response.json();
+
+      setWorkouts(
+        data.map((workout: Workout) => ({
+          ...workout,
+          completed: Boolean(workout.completed),
+        }))
+      );
     }
 
     resetForm();
