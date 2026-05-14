@@ -50,12 +50,19 @@ export default function ProgramsPage({
     if (!form.name.trim() || !form.goal.trim()) return;
 
     if (editingId) {
-      // PUT route will be added later
-      setPrograms(
-        programs.map((program) =>
-          program.id === editingId ? { ...program, ...form } : program
-        )
-      );
+      await fetch(`http://localhost:5001/api/programs/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          goal: form.goal,
+          startDate: form.startDate,
+          endDate: form.endDate,
+          createdBy: "Kail",
+        }),
+      });
     } else {
       await fetch("http://localhost:5001/api/programs", {
         method: "POST",
@@ -71,12 +78,11 @@ export default function ProgramsPage({
           createdBy: "Kail",
         }),
       });
-
-      const response = await fetch("http://localhost:5001/api/programs");
-      const data = await response.json();
-
-      setPrograms(data);
     }
+
+    const response = await fetch("http://localhost:5001/api/programs");
+    const data = await response.json();
+    setPrograms(data);
 
     resetForm();
   }
@@ -92,8 +98,16 @@ export default function ProgramsPage({
     });
   }
 
-  function handleDelete(id: Id) {
-    setPrograms(programs.filter((program) => program.id !== id));
+  async function handleDelete(id: Id) {
+    await fetch(`http://localhost:5001/api/programs/${id}`, {
+      method: "DELETE",
+    });
+
+    const response = await fetch("http://localhost:5001/api/programs");
+
+    const data = await response.json();
+
+    setPrograms(data);
   }
 
   return (

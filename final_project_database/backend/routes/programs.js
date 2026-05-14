@@ -55,4 +55,85 @@ router.post("/", async (req, res) => {
   }
 });
 
+// =========================
+// UPDATE PROGRAM
+// =========================
+router.put("/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const {
+        name,
+        goal,
+        startDate,
+        endDate,
+        createdBy,
+      } = req.body;
+  
+      await db.query(
+        `
+        UPDATE WorkoutPrograms
+        SET
+          program_name = ?,
+          goal = ?,
+          start_date = ?,
+          end_date = ?,
+          created_by = ?
+        WHERE program_id = ?
+        `,
+        [
+          name,
+          goal,
+          startDate,
+          endDate,
+          createdBy,
+          id,
+        ]
+      );
+  
+      res.json({
+        message: "Program updated successfully",
+      });
+    } catch (error) {
+      console.error(
+        "Error updating program:",
+        error.message
+      );
+  
+      res.status(500).json({
+        error: "Failed to update program",
+      });
+    }
+  });
+
+// =========================
+// DELETE PROGRAM
+// =========================
+router.delete("/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      await db.query(
+        `
+        DELETE FROM WorkoutPrograms
+        WHERE program_id = ?
+        `,
+        [id]
+      );
+  
+      res.json({
+        message: "Program deleted successfully",
+      });
+    } catch (error) {
+      console.error(
+        "Error deleting program:",
+        error.message
+      );
+  
+      res.status(500).json({
+        error: "Failed to delete program",
+      });
+    }
+  });
+
 module.exports = router;
