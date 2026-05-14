@@ -53,18 +53,28 @@ export default function WorkoutsPage({
 
     if (!form.name.trim() || !form.program.trim()) return;
 
-    if (editingId) {
-      // PUT route will be added later.
-      setWorkouts(
-        workouts.map((workout) =>
-          workout.id === editingId ? { ...workout, ...form } : workout
-        )
-      );
-    } else {
-      const selectedProgram = programs.find(
-        (program) => program.name === form.program
-      );
+    const selectedProgram = programs.find(
+      (program) => program.name === form.program
+    );
 
+    if (!selectedProgram) return;
+
+    if (editingId) {
+      await fetch(`http://localhost:5001/api/workouts/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: 1,
+          programId: selectedProgram.id,
+          name: form.name,
+          date: form.date,
+          duration: form.duration,
+          completed: form.completed,
+        }),
+      });
+    } else {
       await fetch("http://localhost:5001/api/workouts", {
         method: "POST",
         headers: {
@@ -72,24 +82,25 @@ export default function WorkoutsPage({
         },
         body: JSON.stringify({
           userId: 1,
-          programId: selectedProgram?.id || 1,
+          programId: selectedProgram.id,
           name: form.name,
           date: form.date,
           duration: form.duration,
           completed: form.completed,
         }),
       });
-
-      const response = await fetch("http://localhost:5001/api/workouts");
-      const data = await response.json();
-
-      setWorkouts(
-        data.map((workout: Workout) => ({
-          ...workout,
-          completed: Boolean(workout.completed),
-        }))
-      );
     }
+
+    const response = await fetch("http://localhost:5001/api/workouts");
+
+    const data = await response.json();
+
+    setWorkouts(
+      data.map((workout: Workout) => ({
+        ...workout,
+        completed: Boolean(workout.completed),
+      }))
+    );
 
     resetForm();
   }
@@ -99,15 +110,28 @@ export default function WorkoutsPage({
 
     setForm({
       name: workout.name,
-      date: workout.date,
+      date: String(workout.date).slice(0, 10),
       duration: workout.duration,
       program: workout.program,
-      completed: workout.completed,
+      completed: Boolean(workout.completed),
     });
   }
 
-  function handleDelete(id: Id) {
-    setWorkouts(workouts.filter((workout) => workout.id !== id));
+  async function handleDelete(id: Id) {
+    await fetch(`http://localhost:5001/api/workouts/${id}`, {
+      method: "DELETE",
+    });
+
+    const response = await fetch("http://localhost:5001/api/workouts");
+
+    const data = await response.json();
+
+    setWorkouts(
+      data.map((workout: Workout) => ({
+        ...workout,
+        completed: Boolean(workout.completed),
+      }))
+    );
   }
 
   return (

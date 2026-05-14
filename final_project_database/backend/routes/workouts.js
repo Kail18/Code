@@ -11,6 +11,8 @@ router.get("/", async (req, res) => {
     const [rows] = await db.query(`
       SELECT
         w.workout_id AS id,
+        w.user_id AS userId,
+        w.program_id AS programId,
         w.workout_name AS name,
         w.workout_date AS date,
         w.duration,
@@ -70,11 +72,64 @@ router.post("/", async (req, res) => {
 });
 
 // =========================
-// UPDATE USER
+// UPDATE WORKOUT
 // =========================
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, programId, name, date, duration, completed } = req.body;
+
+    await db.query(
+      `
+      UPDATE Workout
+      SET
+        user_id = ?,
+        program_id = ?,
+        workout_name = ?,
+        workout_date = ?,
+        duration = ?,
+        completed = ?
+      WHERE workout_id = ?
+      `,
+      [
+        userId,
+        programId,
+        name,
+        date,
+        duration,
+        completed ? 1 : 0,
+        id,
+      ]
+    );
+
+    res.json({ message: "Workout updated successfully" });
+  } catch (error) {
+    console.error("Error updating workout:", error.message);
+    res.status(500).json({ error: "Failed to update workout" });
+  }
+});
+
 
 // =========================
-// DELETE USER
+// DELETE WORKOUT
 // =========================
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query(
+      `
+      DELETE FROM Workout
+      WHERE workout_id = ?
+      `,
+      [id]
+    );
+
+    res.json({ message: "Workout deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting workout:", error.message);
+    res.status(500).json({ error: "Failed to delete workout" });
+  }
+});
 
 module.exports = router;
