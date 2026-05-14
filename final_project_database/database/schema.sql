@@ -3,7 +3,7 @@ CREATE DATABASE WorkoutBuilder;
 USE WorkoutBuilder;
 
 CREATE TABLE User (
-    user_id VARCHAR(15) PRIMARY KEY,
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(75) NOT NULL,
     last_name VARCHAR(75) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -12,8 +12,8 @@ CREATE TABLE User (
 );
 
 CREATE TABLE WorkoutPrograms (
-    program_id VARCHAR(15) PRIMARY KEY,
-    user_id VARCHAR(15) NOT NULL,
+    program_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     program_name VARCHAR(75) NOT NULL,
     goal VARCHAR(50),
     start_date DATE NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE WorkoutPrograms (
 );
 
 CREATE TABLE Exercise (
-    exercise_id VARCHAR(15) PRIMARY KEY,
+    exercise_id INT AUTO_INCREMENT PRIMARY KEY,
     exercise_name VARCHAR(75) NOT NULL,
     muscle_group VARCHAR(50) NOT NULL,
     equipment VARCHAR(50),
@@ -38,9 +38,9 @@ CREATE TABLE Exercise (
 );
 
 CREATE TABLE Workout (
-    workout_id VARCHAR(15) PRIMARY KEY,
-    user_id VARCHAR(15) NOT NULL,
-    program_id VARCHAR(15),
+    workout_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    program_id INT,
     workout_name VARCHAR(300) NOT NULL,
     workout_date DATE NOT NULL,
     duration TIME,
@@ -57,9 +57,9 @@ CREATE TABLE Workout (
 );
 
 CREATE TABLE WorkoutExercises (
-    workout_exercise_id VARCHAR(15) PRIMARY KEY,
-    workout_id VARCHAR(15) NOT NULL,
-    exercise_id VARCHAR(15) NOT NULL,
+    workout_exercise_id INT AUTO_INCREMENT PRIMARY KEY,
+    workout_id INT NOT NULL,
+    exercise_id INT NOT NULL,
     sets_completed INT,
     reps_completed INT,
     weight_used INT,

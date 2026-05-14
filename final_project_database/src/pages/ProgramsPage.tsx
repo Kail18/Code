@@ -3,23 +3,19 @@ import ActionButtons from "../components/ActionButtons";
 import CrudCard from "../components/CrudCard";
 import FormButtons from "../components/FormButton";
 import SearchBox from "../components/SearchBox";
-import type { Program, ProgramForm } from "../types";
+import type { Id, Program, ProgramForm } from "../types";
 
 type ProgramsPageProps = {
   programs: Program[];
   setPrograms: React.Dispatch<React.SetStateAction<Program[]>>;
 };
 
-function createId(prefix: string, currentLength: number): string {
-  return `${prefix}${String(currentLength + 1).padStart(3, "0")}`;
-}
-
 export default function ProgramsPage({
   programs,
   setPrograms,
 }: ProgramsPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id | null>(null);
 
   const [form, setForm] = useState<ProgramForm>({
     name: "",
@@ -32,7 +28,7 @@ export default function ProgramsPage({
     () =>
       programs.filter((program) =>
         Object.values(program).some((value) =>
-          value.toLowerCase().includes(searchTerm.toLowerCase())
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       ),
     [programs, searchTerm]
@@ -48,25 +44,38 @@ export default function ProgramsPage({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.name.trim() || !form.goal.trim()) return;
 
     if (editingId) {
+      // PUT route will be added later
       setPrograms(
         programs.map((program) =>
           program.id === editingId ? { ...program, ...form } : program
         )
       );
     } else {
-      setPrograms([
-        ...programs,
-        {
-          id: createId("P", programs.length),
-          ...form,
+      await fetch("http://localhost:5001/api/programs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify({
+          userId: 1,
+          name: form.name,
+          goal: form.goal,
+          startDate: form.startDate,
+          endDate: form.endDate,
+          createdBy: "Kail",
+        }),
+      });
+
+      const response = await fetch("http://localhost:5001/api/programs");
+      const data = await response.json();
+
+      setPrograms(data);
     }
 
     resetForm();
@@ -83,7 +92,7 @@ export default function ProgramsPage({
     });
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: Id) {
     setPrograms(programs.filter((program) => program.id !== id));
   }
 

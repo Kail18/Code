@@ -1,3 +1,5 @@
+export type Id = string | number;
+
 export type PageKey =
   | "dashboard"
   | "programs"
@@ -7,7 +9,7 @@ export type PageKey =
   | "users";
 
 export type Program = {
-  id: string;
+  id: Id;
   name: string;
   goal: string;
   startDate: string;
@@ -15,7 +17,7 @@ export type Program = {
 };
 
 export type Workout = {
-  id: string;
+  id: Id;
   name: string;
   date: string;
   duration: string;
@@ -24,7 +26,7 @@ export type Workout = {
 };
 
 export type Exercise = {
-  id: string;
+  id: Id;
   name: string;
   muscleGroup: string;
   equipment: string;
@@ -32,10 +34,10 @@ export type Exercise = {
 };
 
 export type FinishedWorkout = {
-  id: string;
-  workoutId: string;
+  id: Id;
+  workoutId: Id;
   workoutName: string;
-  exerciseId: string;
+  exerciseId: Id;
   exerciseName: string;
   setsCompleted: number;
   repsCompleted: number;
@@ -45,7 +47,7 @@ export type FinishedWorkout = {
 };
 
 export type User = {
-  id: string;
+  id: Id;
   firstName: string;
   lastName: string;
   email: string;
@@ -53,10 +55,14 @@ export type User = {
 };
 
 export type ProgramForm = Omit<Program, "id">;
+
 export type WorkoutForm = Omit<Workout, "id">;
+
 export type ExerciseForm = Omit<Exercise, "id">;
+
 export type FinishedWorkoutForm = Omit<
   FinishedWorkout,
   "id" | "workoutName" | "exerciseName"
 >;
+
 export type UserForm = Omit<User, "id">;

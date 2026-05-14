@@ -202,6 +202,169 @@ app.post("/api/workouts", async (req, res) => {
 });
 
 
+
+
+app.post("/api/programs", async (req, res) => {
+  try {
+    const { id, userId, name, goal, startDate, endDate, createdBy } = req.body;
+
+    await db.query(
+      `
+      INSERT INTO WorkoutPrograms
+      (
+        program_id,
+        user_id,
+        program_name,
+        goal,
+        start_date,
+        end_date,
+        created_by
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        id,
+        userId,
+        name,
+        goal,
+        startDate,
+        endDate,
+        createdBy,
+      ]
+    );
+
+    res.status(201).json({
+      message: "Program created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating program:", error.message);
+    res.status(500).json({
+      error: "Failed to create program",
+    });
+  }
+});
+
+app.post("/api/finished-workouts", async (req, res) => {
+  try {
+    const {
+      workoutId,
+      exerciseId,
+      setsCompleted,
+      repsCompleted,
+      weightUsed,
+      lengthExercise,
+      loggedAt,
+    } = req.body;
+
+    await db.query(
+      `
+      INSERT INTO WorkoutExercises
+      (
+        workout_id,
+        exercise_id,
+        sets_completed,
+        reps_completed,
+        weight_used,
+        length_exercise,
+        logged_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        workoutId,
+        exerciseId,
+        setsCompleted,
+        repsCompleted,
+        weightUsed,
+        lengthExercise,
+        loggedAt,
+      ]
+    );
+
+    res.status(201).json({
+      message: "Finished workout created successfully",
+    });
+  } catch (error) {
+    console.error(
+      "Error creating finished workout:",
+      error.message
+    );
+
+    res.status(500).json({
+      error: "Failed to create finished workout",
+    });
+  }
+});
+
+app.post("/api/exercises", async (req, res) => {
+  try {
+    const { name, muscleGroup, equipment, tracking } = req.body;
+
+    await db.query(
+      `
+      INSERT INTO Exercise
+      (
+        exercise_name,
+        muscle_group,
+        equipment,
+        tracking,
+        use_sets,
+        use_reps,
+        use_weight,
+        use_time
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        name,
+        muscleGroup,
+        equipment,
+        tracking,
+        tracking.includes("Sets"),
+        tracking.includes("reps"),
+        tracking.includes("weight"),
+        tracking.includes("time"),
+      ]
+    );
+
+    res.status(201).json({ message: "Exercise created successfully" });
+  } catch (error) {
+    console.error("Error creating exercise:", error.message);
+    res.status(500).json({ error: "Failed to create exercise" });
+  }
+});
+
+app.post("/api/users", async (req, res) => {
+  try {
+    const { firstName, lastName, email, dateJoined } = req.body;
+
+    await db.query(
+      `
+      INSERT INTO User
+      (
+        first_name,
+        last_name,
+        email,
+        date_joined,
+        last_login
+      )
+      VALUES (?, ?, ?, ?, NOW())
+      `,
+      [firstName, lastName, email, dateJoined]
+    );
+
+    res.status(201).json({
+      message: "User created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating user:", error.message);
+
+    res.status(500).json({
+      error: "Failed to create user",
+    });
+  }
+});
+
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {

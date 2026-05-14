@@ -3,7 +3,7 @@ import ActionButtons from "../components/ActionButtons";
 import CrudCard from "../components/CrudCard";
 import FormButtons from "../components/FormButton";
 import SearchBox from "../components/SearchBox";
-import type { Program, Workout, WorkoutForm } from "../types";
+import type { Id, Program, Workout, WorkoutForm } from "../types";
 
 type WorkoutsPageProps = {
   workouts: Workout[];
@@ -11,17 +11,13 @@ type WorkoutsPageProps = {
   programs: Program[];
 };
 
-function createId(prefix: string, currentLength: number): string {
-  return `${prefix}${String(currentLength + 1).padStart(3, "0")}`;
-}
-
 export default function WorkoutsPage({
   workouts,
   setWorkouts,
   programs,
 }: WorkoutsPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id | null>(null);
 
   const [form, setForm] = useState<WorkoutForm>({
     name: "",
@@ -58,7 +54,7 @@ export default function WorkoutsPage({
     if (!form.name.trim() || !form.program.trim()) return;
 
     if (editingId) {
-      // We will handle database updates later with PUT.
+      // PUT route will be added later.
       setWorkouts(
         workouts.map((workout) =>
           workout.id === editingId ? { ...workout, ...form } : workout
@@ -75,9 +71,8 @@ export default function WorkoutsPage({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: createId("W", workouts.length),
-          userId: "U001",
-          programId: selectedProgram?.id || "P001",
+          userId: 1,
+          programId: selectedProgram?.id || 1,
           name: form.name,
           date: form.date,
           duration: form.duration,
@@ -111,7 +106,7 @@ export default function WorkoutsPage({
     });
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: Id) {
     setWorkouts(workouts.filter((workout) => workout.id !== id));
   }
 

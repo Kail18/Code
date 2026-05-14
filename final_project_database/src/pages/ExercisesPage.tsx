@@ -3,23 +3,19 @@ import ActionButtons from "../components/ActionButtons";
 import CrudCard from "../components/CrudCard";
 import FormButtons from "../components/FormButton";
 import SearchBox from "../components/SearchBox";
-import type { Exercise, ExerciseForm } from "../types";
+import type { Id, Exercise, ExerciseForm } from "../types";
 
 type ExercisePageProps = {
   exercises: Exercise[];
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
 };
 
-function createId(prefix: string, currentLength: number): string {
-  return `${prefix}${String(currentLength + 1).padStart(3, "0")}`;
-}
-
 export default function ExercisePage({
   exercises,
   setExercises,
 }: ExercisePageProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id | null>(null);
 
   const [form, setForm] = useState<ExerciseForm>({
     name: "",
@@ -32,7 +28,7 @@ export default function ExercisePage({
     () =>
       exercises.filter((exercise) =>
         Object.values(exercise).some((value) =>
-          value.toLowerCase().includes(searchTerm.toLowerCase())
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       ),
     [exercises, searchTerm]
@@ -48,7 +44,7 @@ export default function ExercisePage({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.name.trim() || !form.muscleGroup.trim()) return;
@@ -60,13 +56,23 @@ export default function ExercisePage({
         )
       );
     } else {
-      setExercises([
-        ...exercises,
-        {
-          id: createId("E", exercises.length),
-          ...form,
+      await fetch("http://localhost:5001/api/exercises", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify({
+          name: form.name,
+          muscleGroup: form.muscleGroup,
+          equipment: form.equipment,
+          tracking: form.tracking,
+        }),
+      });
+
+      const response = await fetch("http://localhost:5001/api/exercises");
+      const data = await response.json();
+
+      setExercises(data);
     }
 
     resetForm();
@@ -82,7 +88,7 @@ export default function ExercisePage({
     });
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: Id) {
     setExercises(exercises.filter((exercise) => exercise.id !== id));
   }
 

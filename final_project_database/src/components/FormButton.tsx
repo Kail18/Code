@@ -1,5 +1,7 @@
+import type { Id } from "../types";
+
 type FormButtonsProps = {
-  editingId: string | null;
+  editingId: Id | null;
   resetForm: () => void;
 };
 

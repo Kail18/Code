@@ -3,20 +3,16 @@ import ActionButtons from "../components/ActionButtons";
 import CrudCard from "../components/CrudCard";
 import FormButtons from "../components/FormButton";
 import SearchBox from "../components/SearchBox";
-import type { User, UserForm } from "../types";
+import type { Id, User, UserForm } from "../types";
 
 type UsersPageProps = {
   users: User[];
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
 };
 
-function createId(prefix: string, currentLength: number): string {
-  return `${prefix}${String(currentLength + 1).padStart(3, "0")}`;
-}
-
 export default function UsersPage({ users, setUsers }: UsersPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id | null>(null);
 
   const [form, setForm] = useState<UserForm>({
     firstName: "",
@@ -29,7 +25,7 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
     () =>
       users.filter((user) =>
         Object.values(user).some((value) =>
-          value.toLowerCase().includes(searchTerm.toLowerCase())
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
         )
       ),
     [users, searchTerm]
@@ -45,7 +41,7 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim()) {
@@ -59,13 +55,24 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
         )
       );
     } else {
-      setUsers([
-        ...users,
-        {
-          id: createId("U", users.length),
-          ...form,
+      await fetch("http://localhost:5001/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          dateJoined: form.dateJoined,
+        }),
+      });
+
+      const response = await fetch("http://localhost:5001/api/users");
+
+      const data = await response.json();
+
+      setUsers(data);
     }
 
     resetForm();
@@ -82,7 +89,7 @@ export default function UsersPage({ users, setUsers }: UsersPageProps) {
     });
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: Id) {
     setUsers(users.filter((user) => user.id !== id));
   }
 

@@ -4,6 +4,7 @@ import CrudCard from "../components/CrudCard";
 import FormButtons from "../components/FormButton";
 import SearchBox from "../components/SearchBox";
 import type {
+  Id,
   Exercise,
   FinishedWorkout,
   FinishedWorkoutForm,
@@ -14,23 +15,17 @@ type FinishedWorkoutPageProps = {
   finishedWorkouts: FinishedWorkout[];
   setFinishedWorkouts: React.Dispatch<React.SetStateAction<FinishedWorkout[]>>;
   workouts: Workout[];
-  setWorkouts: React.Dispatch<React.SetStateAction<Workout[]>>;
   exercises: Exercise[];
 };
-
-function createId(prefix: string, currentLength: number): string {
-  return `${prefix}${String(currentLength + 1).padStart(3, "0")}`;
-}
 
 export default function FinishedWorkoutPage({
   finishedWorkouts,
   setFinishedWorkouts,
   workouts,
-  setWorkouts,
   exercises,
 }: FinishedWorkoutPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id | null>(null);
 
   const [form, setForm] = useState<FinishedWorkoutForm>({
     workoutId: "",
@@ -63,15 +58,15 @@ export default function FinishedWorkoutPage({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const selectedWorkout = workouts.find(
-      (workout) => workout.id === form.workoutId
+      (workout) => workout.id === Number(form.workoutId)
     );
 
     const selectedExercise = exercises.find(
-      (exercise) => exercise.id === form.exerciseId
+      (exercise) => exercise.id === Number(form.exerciseId)
     );
 
     if (!selectedWorkout || !selectedExercise) return;
@@ -97,22 +92,30 @@ export default function FinishedWorkoutPage({
         )
       );
     } else {
-      setFinishedWorkouts([
-        ...finishedWorkouts,
-        {
-          id: createId("WE", finishedWorkouts.length),
-          ...logData,
+      await fetch("http://localhost:5001/api/finished-workouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
-    }
+        body: JSON.stringify({
+          workoutId: Number(form.workoutId),
+          exerciseId: Number(form.exerciseId),
+          setsCompleted: form.setsCompleted,
+          repsCompleted: form.repsCompleted,
+          weightUsed: form.weightUsed,
+          lengthExercise: form.lengthExercise,
+          loggedAt: form.loggedAt,
+        }),
+      });
 
-    setWorkouts(
-      workouts.map((workout) =>
-        workout.id === form.workoutId
-          ? { ...workout, completed: true }
-          : workout
-      )
-    );
+      const response = await fetch(
+        "http://localhost:5001/api/finished-workouts"
+      );
+
+      const data = await response.json();
+
+      setFinishedWorkouts(data);
+    }
 
     resetForm();
   }
@@ -131,7 +134,7 @@ export default function FinishedWorkoutPage({
     });
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: Id) {
     setFinishedWorkouts(finishedWorkouts.filter((log) => log.id !== id));
   }
 

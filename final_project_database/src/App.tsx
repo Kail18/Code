@@ -138,7 +138,6 @@ export default function App() {
             finishedWorkouts={finishedWorkouts}
             setFinishedWorkouts={setFinishedWorkouts}
             workouts={workouts}
-            setWorkouts={setWorkouts}
             exercises={exercises}
           />
         )}
