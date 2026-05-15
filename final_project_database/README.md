@@ -82,7 +82,7 @@ docker compose version
 # Step 1 — Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Kail18/Code.git
 cd final_project
 ```
 
@@ -90,7 +90,7 @@ cd final_project
 
 # Step 2 — Start MySQL Using Docker
 
-From the root project folder:
+From the root project folder(final_project):
 
 ```bash
 docker compose up -d
