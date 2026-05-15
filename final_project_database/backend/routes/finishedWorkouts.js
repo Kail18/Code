@@ -39,7 +39,11 @@ router.get("/", async (req, res) => {
 // CREATE FINISHED WORKOUT
 // =========================
 router.post("/", async (req, res) => {
+  let connection;
+
   try {
+    connection = await db.getConnection();
+
     const {
       workoutId,
       exerciseId,
@@ -50,7 +54,9 @@ router.post("/", async (req, res) => {
       loggedAt,
     } = req.body;
 
-    await db.query(
+    await connection.beginTransaction();
+
+    await connection.query(
       `
       INSERT INTO WorkoutExercises
       (
@@ -75,12 +81,35 @@ router.post("/", async (req, res) => {
       ]
     );
 
+    await connection.query(
+      `
+      UPDATE Exercise
+      SET times_completed = times_completed + 1
+      WHERE exercise_id = ?
+      `,
+      [exerciseId]
+    );
+
+    await connection.commit();
+
     res.status(201).json({
       message: "Finished workout created successfully",
     });
   } catch (error) {
-    console.error("Error creating finished workout:", error.message);
-    res.status(500).json({ error: "Failed to create finished workout" });
+    if (connection) {
+      await connection.rollback();
+    }
+
+    console.error("Error creating finished workout:", error);
+
+    res.status(500).json({
+      error: "Failed to create finished workout",
+      details: error.message,
+    });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
@@ -130,10 +159,7 @@ router.put("/:id", async (req, res) => {
       message: "Finished workout updated successfully",
     });
   } catch (error) {
-    console.error(
-      "Error updating finished workout:",
-      error.message
-    );
+    console.error("Error updating finished workout:", error.message);
 
     res.status(500).json({
       error: "Failed to update finished workout",

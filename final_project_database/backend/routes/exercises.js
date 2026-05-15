@@ -43,9 +43,10 @@ router.post("/", async (req, res) => {
         use_sets,
         use_reps,
         use_weight,
-        use_time
+        use_time,
+        times_completed
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         name,
@@ -53,9 +54,10 @@ router.post("/", async (req, res) => {
         equipment,
         tracking,
         tracking.includes("Sets"),
-        tracking.includes("reps"),
-        tracking.includes("weight"),
-        tracking.includes("time"),
+        tracking.includes("Reps"),
+        tracking.includes("Weight"),
+        tracking.includes("Time"),
+        0,
       ]
     );
 

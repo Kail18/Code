@@ -30,7 +30,7 @@
 
 ### Anomaly Identification
 
-- I will ask Professor Farlow on this one
+- There are no obvious anomalies in this database.
 
 ### Decomposition Steps
 
@@ -38,4 +38,4 @@
 
 ### Final Relational Schema
 
-- I will ask Professor Farlow on this one.
+- There is no updates as the schema was already in 3rd normal form
