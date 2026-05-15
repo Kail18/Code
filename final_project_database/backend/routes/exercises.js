@@ -71,7 +71,7 @@ router.post("/", async (req, res) => {
 });
 
 // =========================
-// UPDATE USER
+// UPDATE EXERCISE
 // =========================
 router.put("/:id", async (req, res) => {
   try {
@@ -124,7 +124,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // =========================
-// DELETE USER
+// DELETE EXERCISE
 // =========================
 router.delete("/:id", async (req, res) => {
   try {

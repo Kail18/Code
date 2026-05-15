@@ -79,44 +79,38 @@ export default function FinishedWorkoutPage({
       return;
     }
 
-    const logData = {
-      ...form,
-      workoutName: selectedWorkout.name,
-      exerciseName: selectedExercise.name,
+    const requestBody = {
+      workoutId: Number(form.workoutId),
+      exerciseId: Number(form.exerciseId),
+      setsCompleted: form.setsCompleted,
+      repsCompleted: form.repsCompleted,
+      weightUsed: form.weightUsed,
+      lengthExercise: form.lengthExercise,
+      loggedAt: form.loggedAt,
     };
 
     if (editingId) {
-      setFinishedWorkouts(
-        finishedWorkouts.map((log) =>
-          log.id === editingId ? { ...log, ...logData } : log
-        )
-      );
+      await fetch(`http://localhost:5001/api/finished-workouts/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
     } else {
       await fetch("http://localhost:5001/api/finished-workouts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          workoutId: Number(form.workoutId),
-          exerciseId: Number(form.exerciseId),
-          setsCompleted: form.setsCompleted,
-          repsCompleted: form.repsCompleted,
-          weightUsed: form.weightUsed,
-          lengthExercise: form.lengthExercise,
-          loggedAt: form.loggedAt,
-        }),
+        body: JSON.stringify(requestBody),
       });
-
-      const response = await fetch(
-        "http://localhost:5001/api/finished-workouts"
-      );
-
-      const data = await response.json();
-
-      setFinishedWorkouts(data);
     }
 
+    const response = await fetch("http://localhost:5001/api/finished-workouts");
+    const data = await response.json();
+
+    setFinishedWorkouts(data);
     resetForm();
   }
 
@@ -130,12 +124,19 @@ export default function FinishedWorkoutPage({
       repsCompleted: log.repsCompleted,
       weightUsed: log.weightUsed,
       lengthExercise: log.lengthExercise,
-      loggedAt: log.loggedAt,
+      loggedAt: String(log.loggedAt).slice(0, 10),
     });
   }
 
-  function handleDelete(id: Id) {
-    setFinishedWorkouts(finishedWorkouts.filter((log) => log.id !== id));
+  async function handleDelete(id: Id) {
+    await fetch(`http://localhost:5001/api/finished-workouts/${id}`, {
+      method: "DELETE",
+    });
+
+    const response = await fetch("http://localhost:5001/api/finished-workouts");
+    const data = await response.json();
+
+    setFinishedWorkouts(data);
   }
 
   return (
